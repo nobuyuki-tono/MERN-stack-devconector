@@ -77,7 +77,7 @@ router.post(
         }
       );
 
-      res.send("User Registered");
+      // res.send("User Registered");
     } catch (err) {
       console.log(err.message);
       res.status(500).send("Server error");
