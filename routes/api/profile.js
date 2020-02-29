@@ -1,4 +1,6 @@
 const express = require("express");
+const request = require("request");
+const config = require("config");
 const auth = require("../../middleware/auth");
 const { check, validationResult } = require("express-validator");
 
@@ -253,7 +255,7 @@ router.put(
     check("degree", "Degree is required")
       .not()
       .isEmpty(),
-    check("fieldofsutudy", "Field of study is required")
+    check("fieldofstudy", "Field of study is required")
       .not()
       .isEmpty(),
     check("from", "From date is required")
@@ -263,7 +265,7 @@ router.put(
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: erros.array() });
+      return res.status(400).json({ errors: errors.array() });
     }
 
     const {
@@ -280,7 +282,7 @@ router.put(
       school,
       degree,
       fieldofstudy,
-      fron,
+      from,
       to,
       current,
       description
@@ -316,8 +318,41 @@ router.delete("/education/:edu_id", auth, async (req, res) => {
 
     profile.education.splice(removeIndex, 1);
     await profile.save();
+    res.json(profile);
   } catch (err) {
     console.error(err.message);
+  }
+});
+
+// @route  GET api/profile/github/:username
+// @desc   Get user repos from github
+// @access  Public
+router.get("/github/:username", (req, res) => {
+  try {
+    const option = {
+      uri: `https://api.github.com/users/${
+        req.params.username
+      }/repos?per_page=5&sort=created:asc&client_id=${config.get(
+        "githubClientId"
+      )}&client_secret=${config.get("githubSecret")}`,
+      method: "GET",
+      headers: { "user-agent": "node.js" }
+    };
+
+    request(options, (error, res, body) => {
+      if (error) {
+        console.err(error);
+      }
+
+      if (res.statusCode !== 200) {
+        res.status(404).json({ msg: "No Github profile found" });
+      }
+
+      res.json(JSON.parse(body));
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send("Server Error");
   }
 });
 
