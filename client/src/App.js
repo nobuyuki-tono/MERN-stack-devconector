@@ -6,7 +6,7 @@ import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 // Redux
 import { Provider } from "react-dedux";
-import { store } from "./store";
+import store from "./store";
 
 import "./App.css";
 
