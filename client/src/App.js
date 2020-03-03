@@ -1,17 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import Navbar from "./components/layout/Navbar";
 import Landing from "./components/layout/Landing";
 import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import Alert from "./components/layout/Alert";
+import { loadUser } from "./actions/auth";
+
 // Redux
 import { Provider } from "react-dedux";
 import store from "./store";
 
-import "./App.css";
+import {} from "./utils/setAuthToken";
 
-function App() {
+import "./App.css";
+import setAuthToken from "./utils/setAuthToken";
+
+if (localStorage.token) {
+  setAuthToken(localStorage.token);
+}
+
+const App = () => {
+  useEffect(() => {
+    store.dispatch(loadUser());
+  }, []);
   return (
     <Provider store={store}>
       <Router>
@@ -29,6 +41,6 @@ function App() {
       </Router>
     </Provider>
   );
-}
+};
 
 export default App;
